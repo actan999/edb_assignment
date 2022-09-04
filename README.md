@@ -17,15 +17,20 @@ The exercise can be done with a series of scripts and simple local database. Can
 assignment. Candidates can commit more time if it is fun.
 
 We will be looking at the scripts, documentation on how to setup and run the scripts.
+
 Good luck and have fun!
 
 Hints:
+
 To get a project, the request need to include the organsiation and the project
 (https://docs.github.com/en/free-pro-team@latest/rest/reference/projects#list-organization-projects)
 Commits API: https://docs.github.com/en/free-pro-team@latest/rest/reference/repos#list-commits
 There are 2 user concepts, an author and a committer. We will use the committer object. 
 
 Instruction:
+
 Please run the 2 notebooks in sequence according to their prefix order, to view the final analysis.
+
 Please use your personal Github token to call Github REST API in '10 - Download from Github API'.  You can supply your token to variable, 'access_token'.
+
 You may reproduce the conda virtual environment by installing the 
