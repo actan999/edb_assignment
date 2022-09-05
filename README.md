@@ -33,4 +33,4 @@ Please run the 2 notebooks in sequence according to their prefix order, to view 
 
 Please use your personal Github token to call Github REST API in '10 - Download from Github API'.  You can supply your token to variable, 'access_token'.
 
-You may reproduce the conda virtual environment by installing the 
+You may reproduce the conda virtual environment by installing the packages listed in the environment.yml file.
