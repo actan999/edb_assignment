@@ -10,7 +10,9 @@ over the last 6 months. (plus points if this window of time can be varied)
 With the data ingested, address the follow queries:
 
 • For the ingested commits, determine the top 5 committers ranked by count of commits and their number of commits.
+
 • For the ingested commits, determine the committer with the longest commit streak.
+
 • For the ingested commits, generate a heatmap of number of commits count by all users by day of the week and by 3 hour blocks
 
 The exercise can be done with a series of scripts and simple local database. Candidate to use any tools and language that they are comfortable with. We expect a commitment of between 4 to 6 hours for this
