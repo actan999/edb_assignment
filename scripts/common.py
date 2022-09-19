@@ -9,38 +9,6 @@ from pandas.api.types import CategoricalDtype
 
 
 
-six_mth_period = [('2022-03-01', '2022-03-14'),
-                ('2022-03-15', '2022-03-27'),
-                ('2022-03-28', '2022-04-09'),
-                ('2022-04-10', '2022-04-22'),
-                ('2022-04-23', '2022-05-05'),
-                ('2022-05-06', '2022-05-18'),
-                ('2022-05-19', '2022-05-31'),
-                ('2022-06-01', '2022-06-13'),
-                ('2022-06-14', '2022-06-26'),
-                ('2022-06-27', '2022-07-09'),
-                ('2022-07-10', '2022-07-22'),
-                ('2022-07-23', '2022-08-05'),
-                ('2022-08-06', '2022-08-18'),
-                ('2022-08-19', '2022-08-31'),]
-
-
-three_hourly_blocks = [
-    ('00-03', '00:00:00' , '02:59:00'),
-    ('03-06', '03:00:00' , '05:59:00'),
-    ('06-09', '06:00:00' , '08:59:00'),
-    ('09-12', '09:00:00' , '11:59:00'),
-    ('12-15', '12:00:00' , '14:59:00'),
-    ('15-18', '15:00:00' , '17:59:00'),
-    ('18-21', '18:00:00' , '20:59:00'),
-    ('21-00', '21:00:00' , '23:59:00'),
-]
-
-
-ordered_weekday = [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-
-
 def pause_until(time):
     """ 
     Pause your program until a specific end time. 'time' is either
@@ -165,6 +133,15 @@ def seek_consecutive_dates(sorted_date_sequence_in_yyyy_mm_dd_format):
     return ranges
 
 
+def max_len_commit_streak(output_of_seek_consecutive_dates):
+    max_streak_len = 1
+    for _, value in output_of_seek_consecutive_dates.items():
+        if len(value) > max_streak_len:
+            period = value
+            max_streak_len = len(value)
+    return period, max_streak_len
+
+
 def localize_timestamp_to_local_timezone(df, utc_time_col, local_timezone):
     df['utc_dt_local_tz'] = pd.to_datetime(df[utc_time_col], utc=True, errors='coerce').dt.tz_convert(local_timezone)
     df['utc_dt_isoformat'] = df['utc_dt_local_tz'].dt.strftime('%Y-%m-%d')
@@ -199,15 +176,15 @@ def ordering_weekdays(df, day_of_week_col, ordered_weekday):
     return df
 
 
-
-def df_for_heatmap(df, local_timezone):
+def df_for_heatmap(df, local_timezone, three_hourly_blocks, ordered_weekday):
     issue_3_df = localize_timestamp_to_local_timezone(df.copy(), 'commit_datetime', local_timezone)
     issue_3_df = day_of_week(issue_3_df, 'utc_dt_local_tz')
     issue_3_df = clock_time(issue_3_df, 'utc_dt_local_tz')
     issue_3_df['datetime_index'] = pd.to_datetime(issue_3_df['utc_dt_local_tz'])
     issue_3_df_time_indexed = issue_3_df.set_index('datetime_index')
-    issue_3_df_time_indexed = time_partitioning(issue_3_df_time_indexed, three_hourly_blocks)
-    issue_3_df_time_indexed = ordering_weekdays(issue_3_df_time_indexed, 'day_of_week', ordered_weekday)
+    issue_3_df_time_indexed = time_partitioning(issue_3_df_time_indexed, time_blocks=three_hourly_blocks)
+    issue_3_df_time_indexed = ordering_weekdays(issue_3_df_time_indexed, 'day_of_week', ordered_weekday=ordered_weekday)
+    issue_3_df_time_indexed = issue_3_df_time_indexed.loc[~ issue_3_df_time_indexed.index.duplicated(), :]
     issue_3_df_time_indexed.asfreq('Min')
     return issue_3_df_time_indexed
 
