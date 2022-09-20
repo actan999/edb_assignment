@@ -1,9 +1,9 @@
-from datetime import datetime, timezone, timedelta, date
+from datetime import datetime, timezone
 import time
 import requests
 import json
 import pandas as pd
-import datetime as dt
+import datetime
 import sqlite3
 from pandas.api.types import CategoricalDtype
 
@@ -19,7 +19,7 @@ def pause_until(time):
 
     # Convert datetime to Unix timestamp and adjust for locality
     if isinstance(time, datetime):
-        # If we're on Python 3 and the user specified a timezone, convert to UTC and get timestamp
+        # If the user specified a timezone, convert to UTC and get timestamp
         if time.tzinfo:
             end = time.astimezone(timezone.utc).timestamp()
         else:
@@ -61,13 +61,13 @@ def manage_rate_limit(response):
         if response.status_code != 200:
             if response.status_code == 429:
                 buffer_wait_time = 15
-                resume_time = datetime.fromtimestamp( int(response.headers["x-rate-limit-reset"]) + buffer_wait_time )
+                resume_time = datetime.fromtimestamp( int(response.headers["X-RateLimit-Reset"]) + buffer_wait_time )
                 print(f"Too many requests. Waiting on endpoint.\n\tResume Time: {resume_time}")
                 pause_until(resume_time)
 
             # internal server error
             elif response.status_code == 500:
-                # Twitter needs a break, so we wait 30 seconds
+                # Endpoint needs a break, so we wait 30 seconds
                 resume_time = datetime.now().timestamp() + 30
                 print(f"Internal server error @ endpoint. Giving endpoint a break...\n\tResume Time: {resume_time}")
                 pause_until(resume_time)
@@ -110,7 +110,7 @@ def query_sqlite3_db(sql_db, sql_string):
 
 
 def seek_consecutive_dates(sorted_date_sequence_in_yyyy_mm_dd_format):
-    dates = [datetime.strptime(d, "%Y-%m-%d") for d in sorted_date_sequence_in_yyyy_mm_dd_format]
+    dates = [datetime.datetime.strptime(d, "%Y-%m-%d") for d in sorted_date_sequence_in_yyyy_mm_dd_format]
     dates_integer = [date.toordinal() for date in dates]  # day count from the date 01/01/01
     ranges = {}
     a_range = []
@@ -120,7 +120,7 @@ def seek_consecutive_dates(sorted_date_sequence_in_yyyy_mm_dd_format):
     for integer in dates_integer:
         if (integer + 1 == dates_integer[index] + 1) and (integer - 1 == prev_integer): # if integers are consecutive, forward & backward
             a_range.append(dates[index].strftime("%Y-%m-%d"))
-        elif prev_integer == 0:  # apend 1st date to a_range list since 'prev_integer' has not been updated
+        elif prev_integer == 0:  # append 1st date to a_range list since 'prev_integer' has not been updated
             a_range.append(dates[index].strftime("%Y-%m-%d"))
         else:
             ranges.update({f'Range{j}': tuple(a_range)}) # integer no longer consecutive, update dict with new range
